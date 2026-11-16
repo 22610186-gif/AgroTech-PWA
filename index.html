@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#163d2b">
+    <meta name="description" content="AgroTech, plataforma para administrar cultivos">
+
+    <title>AgroTech | Gestión agrícola</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="brand">
+            <span class="logo">🌱</span>
+            <div>
+                <h1>AgroTech</h1>
+                <small>Gestión agrícola inteligente</small>
+            </div>
+        </div>
+
+        <div class="connection">
+            <span id="connectionStatus">● Conectado</span>
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+            <h3>MENÚ PRINCIPAL</h3>
+
+            <button class="menu-btn active" data-view="inicio">
+                🏠 Inicio
+            </button>
+
+            <button class="menu-btn" data-view="cultivos">
+                🌾 Mis cultivos
+            </button>
+
+            <button class="menu-btn" data-view="ubicacion">
+                📍 Ubicación
+            </button>
+
+            <button class="menu-btn" data-view="camara">
+                📷 Cámara
+            </button>
+        </aside>
+
+        <main class="main-content">
+
+            <section id="inicio" class="view active">
+                <div class="welcome">
+                    <h2>Bienvenido a AgroTech</h2>
+                    <p>Administra tus cultivos desde cualquier lugar.</p>
+                </div>
+
+                <div class="cards">
+                    <article class="card">
+                        <span>🌱</span>
+                        <h3>Mis cultivos</h3>
+                        <strong id="totalCultivos">0</strong>
+                        <p>Cultivos registrados</p>
+                    </article>
+
+                    <article class="card">
+                        <span>📍</span>
+                        <h3>Ubicación</h3>
+                        <strong id="locationStatus">Sin registrar</strong>
+                        <p>Ubicación del terreno</p>
+                    </article>
+
+                    <article class="card">
+                        <span>📷</span>
+                        <h3>Fotografías</h3>
+                        <strong id="totalFotos">0</strong>
+                        <p>Fotos capturadas</p>
+                    </article>
+                </div>
+
+                <div class="panel">
+                    <h2>Actividad reciente</h2>
+                    <div id="recentActivity">
+                        <p>Aún no hay cultivos registrados.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cultivos" class="view">
+                <div class="section-heading">
+                    <h2>Mis cultivos</h2>
+                    <p>Registra y administra tus terrenos.</p>
+                </div>
+
+                <div class="panel">
+                    <h3>Registrar nuevo cultivo</h3>
+
+                    <form id="cropForm">
+                        <label>Nombre del cultivo</label>
+                        <input id="cropName" type="text"
+                            placeholder="Ej. Maíz" required>
+
+                        <label>Área del terreno (hectáreas)</label>
+                        <input id="cropArea" type="number"
+                            min="0.01" step="0.01"
+                            placeholder="Ej. 2.5" required>
+
+                        <label>Descripción</label>
+                        <textarea id="cropDescription"
+                            placeholder="Descripción del cultivo"></textarea>
+
+                        <button class="primary-btn" type="submit">
+                            Guardar cultivo
+                        </button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <h3>Cultivos registrados</h3>
+                    <div id="cropList">
+                        <p>No hay cultivos registrados.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ubicacion" class="view">
+                <div class="section-heading">
+                    <h2>Ubicación del terreno</h2>
+                    <p>Obtén las coordenadas mediante el GPS.</p>
+                </div>
+
+                <div class="panel">
+                    <button id="getLocation" class="primary-btn">
+                        Obtener mi ubicación
+                    </button>
+
+                    <div id="locationResult">
+                        <p>Esperando ubicación...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="camara" class="view">
+                <div class="section-heading">
+                    <h2>Cámara agrícola</h2>
+                    <p>Captura fotografías de tus cultivos.</p>
+                </div>
+
+                <div class="panel">
+                    <video id="cameraPreview" autoplay playsinline></video>
+
+                    <div class="actions">
+                        <button id="startCamera" class="primary-btn">
+                            Activar cámara
+                        </button>
+
+                        <button id="takePhoto" class="secondary-btn">
+                            Tomar fotografía
+                        </button>
+                    </div>
+
+                    <canvas id="photoCanvas" hidden></canvas>
+
+                    <div id="photoGallery"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer>
+        <p>AgroTech PWA © 2026 | Tecnología para el campo</p>
+    </footer>
+
+    <script src="js/database.js"></script>
+    <script src="js/location.js"></script>
+    <script src="js/camera.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
