@@ -1,0 +1,14 @@
+{
+  "hosting": [
+    {
+      "target": "agrotech",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    },
+    {
+      "site": "inundacion-d5c9e",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+    }
+  ]
+}

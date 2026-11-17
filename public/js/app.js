@@ -14,41 +14,52 @@ buttons.forEach(button => {
     });
 });
 
-document.getElementById("cropForm").addEventListener("submit", async (event) => {
+document.getElementById("cropForm").addEventListener("submit", async event => {
     event.preventDefault();
 
-    const cultivo = {
-        nombre: document.getElementById("cropName").value.trim(),
-        area: Number(document.getElementById("cropArea").value),
-        descripcion: document.getElementById("cropDescription").value.trim(),
-        fecha: new Date().toLocaleDateString()
-    };
+    const nombre = document.getElementById("cropName").value.trim();
+    const area = Number(document.getElementById("cropArea").value);
+    const descripcion = document.getElementById("cropDescription").value.trim();
 
-    if (!cultivo.nombre || !Number.isFinite(cultivo.area) || cultivo.area <= 0) {
-        alert("Verifica los datos del cultivo.");
+    if (!nombre || !Number.isFinite(area) || area <= 0) {
+        alert("Ingresa un nombre y un área válida.");
         return;
     }
 
+    const button = event.target.querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.textContent = "Guardando...";
+
     try {
-        await guardarCultivo(cultivo);
+        await guardarCultivo({
+            nombre,
+            area,
+            descripcion,
+            fecha: new Date().toLocaleDateString("es-MX")
+        });
 
         event.target.reset();
 
         await actualizarDashboard();
 
-        alert("Cultivo registrado correctamente.");
+        alert("¡Cultivo guardado correctamente!");
 
     } catch (error) {
-        alert("No se pudo guardar el cultivo.");
+        console.error("Error al guardar cultivo:", error);
+        alert("No se pudo guardar el cultivo: " + error.message);
+
+    } finally {
+        button.disabled = false;
+        button.textContent = "Guardar cultivo";
     }
 });
 
 async function actualizarDashboard() {
     const cultivos = await obtenerCultivos();
-    const fotos = await obtenerFotografias();
+    const fotografias = await obtenerFotografias();
 
     document.getElementById("totalCultivos").textContent = cultivos.length;
-    document.getElementById("totalFotos").textContent = fotos.length;
+    document.getElementById("totalFotos").textContent = fotografias.length;
 
     const list = document.getElementById("cropList");
     const recent = document.getElementById("recentActivity");
@@ -62,7 +73,7 @@ async function actualizarDashboard() {
         return;
     }
 
-    cultivos.forEach(cultivo => {
+    cultivos.slice().reverse().forEach(cultivo => {
         const item = document.createElement("div");
         item.className = "panel";
 
@@ -75,12 +86,14 @@ async function actualizarDashboard() {
         const description = document.createElement("p");
         description.textContent = cultivo.descripcion || "Sin descripción";
 
-        item.append(title, area, description);
+        const date = document.createElement("small");
+        date.textContent = `Fecha: ${cultivo.fecha}`;
+
+        item.append(title, area, description, date);
         list.appendChild(item);
     });
 
     const last = cultivos[cultivos.length - 1];
-
     recent.textContent = `Último cultivo registrado: ${last.nombre}`;
 }
 
@@ -101,6 +114,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         await actualizarDashboard();
         await mostrarGaleria();
         actualizarConexion();
+
+        console.log("AgroTech inicializado correctamente.");
+
     } catch (error) {
         console.error("Error inicializando AgroTech:", error);
     }
@@ -110,9 +126,9 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {
         try {
             await navigator.serviceWorker.register("./sw.js");
-            console.log("Service Worker registrado correctamente.");
+            console.log("Service Worker registrado.");
         } catch (error) {
-            console.error("Error registrando Service Worker:", error);
+            console.error("Error en Service Worker:", error);
         }
     });
 }

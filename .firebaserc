@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "inundacion-d5c9e"
+  },
+  "targets": {
+    "inundacion-d5c9e": {
+      "hosting": {
+        "agrotech": [
+          "agrotech-pwa"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
