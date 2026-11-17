@@ -19,6 +19,17 @@ document.getElementById("getLocation").addEventListener("click", () => {
                 <h3>Ubicación obtenida</h3>
                 <p>Latitud: ${latitude}</p>
                 <p>Longitud: ${longitude}</p>
+                <div style="margin: 12px 0; border-radius: 12px; overflow: hidden; border: 1px solid #dfe7e1;">
+                    <iframe
+                        src="https://www.google.com/maps?q=${latitude},${longitude}&z=16&output=embed"
+                        width="100%"
+                        height="260"
+                        style="border:0; display:block;"
+                        allowfullscreen
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
                 <a href="https://www.google.com/maps?q=${latitude},${longitude}"
                    target="_blank" rel="noopener">
                    Ver en Google Maps
