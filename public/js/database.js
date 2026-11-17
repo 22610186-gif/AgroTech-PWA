@@ -124,3 +124,11 @@ async function obtenerFotografias() {
         store => store.getAll()
     );
 }
+
+async function eliminarFotografia(id) {
+    return ejecutarTransaccion(
+        "fotografias",
+        "readwrite",
+        store => store.delete(id)
+    );
+}

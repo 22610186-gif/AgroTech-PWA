@@ -60,12 +60,34 @@ async function mostrarGaleria() {
 
     gallery.innerHTML = "";
 
-    photos.forEach(photo => {
-        const img = document.createElement("img");
+    if (photos.length === 0) {
+        gallery.innerHTML = "<p>No hay fotos capturadas.</p>";
+        return;
+    }
 
+    photos.forEach(photo => {
+        const card = document.createElement("div");
+        card.className = "photo-item";
+
+        const img = document.createElement("img");
         img.src = URL.createObjectURL(photo.imagen);
         img.alt = "Fotografía de cultivo";
 
-        gallery.appendChild(img);
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Eliminar";
+        deleteButton.className = "secondary-btn";
+        deleteButton.addEventListener("click", async () => {
+            const confirmar = confirm("¿Deseas eliminar esta foto?");
+            if (!confirmar) return;
+
+            await eliminarFotografia(photo.id);
+            await actualizarDashboard();
+            await mostrarGaleria();
+        });
+
+        card.appendChild(img);
+        card.appendChild(deleteButton);
+        gallery.appendChild(card);
     });
 }
