@@ -64,27 +64,30 @@ document.getElementById("takePhoto").addEventListener("click", async () => {
 
 async function mostrarGaleria() {
     const gallery = document.getElementById("photoGallery");
-    const cropSelector = document.getElementById("cameraCropSelector");
-    const selectedCropId = cropSelector ? Number(cropSelector.value) : null;
-    const photos = (await obtenerFotografias()).filter(photo => {
-        if (!selectedCropId) return true;
-        return Number(photo.cultivoId) === selectedCropId;
-    });
+    const photos = await obtenerFotografias();
+
+    if (!gallery) return;
 
     gallery.innerHTML = "";
 
     if (photos.length === 0) {
-        gallery.innerHTML = "<p>No hay fotos capturadas para este cultivo.</p>";
+        gallery.innerHTML = "<p>No hay fotos capturadas.</p>";
         return;
     }
 
-    photos.forEach(photo => {
+    for (const photo of photos) {
         const card = document.createElement("div");
         card.className = "photo-item";
 
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(photo.imagen);
-        img.alt = "Fotografía de cultivo";
+        const image = document.createElement("img");
+        image.src = URL.createObjectURL(photo.imagen);
+        image.alt = "Fotografía de cultivo";
+
+        const meta = document.createElement("p");
+        const cultivo = await obtenerCultivos().then(cultivos =>
+            cultivos.find(item => Number(item.id) === Number(photo.cultivoId))
+        );
+        meta.textContent = cultivo ? `Cultivo: ${cultivo.nombre}` : "Foto sin cultivo asociado";
 
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
@@ -99,8 +102,9 @@ async function mostrarGaleria() {
             await mostrarGaleria();
         });
 
-        card.appendChild(img);
+        card.appendChild(image);
+        card.appendChild(meta);
         card.appendChild(deleteButton);
         gallery.appendChild(card);
-    });
+    }
 }

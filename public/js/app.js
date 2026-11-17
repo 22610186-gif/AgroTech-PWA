@@ -85,6 +85,51 @@ function actualizarSelectoresCultivos(cultivos) {
     });
 }
 
+function formatCoordinates(latitud, longitud) {
+    if (latitud == null || longitud == null) return "Sin coordenadas";
+    return `${Number(latitud).toFixed(5)}, ${Number(longitud).toFixed(5)}`;
+}
+
+async function actualizarUbicacionVista() {
+    const cultivos = await obtenerCultivos();
+    const container = document.getElementById("locationList");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const cropsWithLocation = cultivos.filter(cultivo =>
+        cultivo.latitud != null && cultivo.longitud != null
+    );
+
+    if (cropsWithLocation.length === 0) {
+        container.innerHTML = "<p>No hay cultivos con ubicación registrada.</p>";
+        return;
+    }
+
+    cropsWithLocation.forEach(cultivo => {
+        const item = document.createElement("div");
+        item.className = "panel";
+
+        const title = document.createElement("h3");
+        title.textContent = cultivo.nombre;
+
+        const coords = document.createElement("p");
+        coords.textContent = `Coordenadas: ${formatCoordinates(cultivo.latitud, cultivo.longitud)}`;
+
+        const map = document.createElement("iframe");
+        map.src = `https://www.google.com/maps?q=${cultivo.latitud},${cultivo.longitud}&z=15&output=embed`;
+        map.width = "100%";
+        map.height = "220";
+        map.style.border = "0";
+        map.style.borderRadius = "10px";
+        map.style.marginTop = "10px";
+
+        item.append(title, coords, map);
+        container.appendChild(item);
+    });
+}
+
 async function actualizarDashboard() {
     const cultivos = await obtenerCultivos();
     const fotografias = await obtenerFotografias();
@@ -102,6 +147,7 @@ async function actualizarDashboard() {
     if (cultivos.length === 0) {
         list.textContent = "No hay cultivos registrados.";
         recent.textContent = "Aún no hay cultivos registrados.";
+        await actualizarUbicacionVista();
         return;
     }
 
@@ -119,21 +165,22 @@ async function actualizarDashboard() {
         description.textContent = cultivo.descripcion || "Sin descripción";
 
         const location = document.createElement("p");
-        if (cultivo.latitud != null && cultivo.longitud != null) {
-            location.textContent = `Ubicación: ${cultivo.latitud.toFixed(5)}, ${cultivo.longitud.toFixed(5)}`;
-        } else {
-            location.textContent = "Ubicación: sin coordenadas";
-        }
+        location.textContent = `Ubicación: ${formatCoordinates(cultivo.latitud, cultivo.longitud)}`;
+
+        const photoCount = document.createElement("p");
+        const fotosCultivo = fotografias.filter(foto => Number(foto.cultivoId) === Number(cultivo.id));
+        photoCount.textContent = `Fotos: ${fotosCultivo.length}`;
 
         const date = document.createElement("small");
         date.textContent = `Fecha: ${cultivo.fecha}`;
 
-        item.append(title, area, description, location, date);
+        item.append(title, area, description, location, photoCount, date);
         list.appendChild(item);
     });
 
     const last = cultivos[cultivos.length - 1];
     recent.textContent = `Último cultivo registrado: ${last.nombre}`;
+    await actualizarUbicacionVista();
 }
 
 window.addEventListener("online", actualizarConexion);
