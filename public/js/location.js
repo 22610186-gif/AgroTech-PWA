@@ -1,7 +1,18 @@
 
-document.getElementById("getLocation").addEventListener("click", () => {
+window.ubicacionActual = {
+    latitud: null,
+    longitud: null
+};
+
+window.establecerUbicacionActual = function (latitud, longitud) {
+    window.ubicacionActual = { latitud, longitud };
+};
+
+document.getElementById("getLocation").addEventListener("click", async () => {
 
     const result = document.getElementById("locationResult");
+    const cropSelector = document.getElementById("cropSelector");
+    const cropId = cropSelector ? Number(cropSelector.value) : null;
 
     if (!navigator.geolocation) {
         result.textContent = "Tu dispositivo no admite geolocalización.";
@@ -11,9 +22,27 @@ document.getElementById("getLocation").addEventListener("click", () => {
     result.textContent = "Obteniendo ubicación...";
 
     navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+
+            window.establecerUbicacionActual(latitude, longitude);
+            const summary = document.getElementById("cropLocationSummary");
+            if (summary) {
+                summary.textContent = `Lat: ${latitude.toFixed(5)}, Lng: ${longitude.toFixed(5)}`;
+            }
+
+            if (cropId) {
+                try {
+                    await actualizarCultivo(cropId, {
+                        latitud: latitude,
+                        longitud: longitude
+                    });
+                    await actualizarDashboard();
+                } catch (error) {
+                    console.error("Error guardando la ubicación del cultivo:", error);
+                }
+            }
 
             result.innerHTML = `
                 <h3>Ubicación obtenida</h3>

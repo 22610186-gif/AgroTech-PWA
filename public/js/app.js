@@ -20,6 +20,10 @@ document.getElementById("cropForm").addEventListener("submit", async event => {
     const nombre = document.getElementById("cropName").value.trim();
     const area = Number(document.getElementById("cropArea").value);
     const descripcion = document.getElementById("cropDescription").value.trim();
+    const ubicacion = window.ubicacionActual && Number.isFinite(window.ubicacionActual.latitud) ? {
+        latitud: window.ubicacionActual.latitud,
+        longitud: window.ubicacionActual.longitud
+    } : {};
 
     if (!nombre || !Number.isFinite(area) || area <= 0) {
         alert("Ingresa un nombre y un área válida.");
@@ -35,10 +39,13 @@ document.getElementById("cropForm").addEventListener("submit", async event => {
             nombre,
             area,
             descripcion,
-            fecha: new Date().toLocaleDateString("es-MX")
+            fecha: new Date().toLocaleDateString("es-MX"),
+            ...ubicacion
         });
 
         event.target.reset();
+        document.getElementById("cropLocationSummary").textContent = "Sin ubicación registrada.";
+        window.establecerUbicacionActual(null, null);
 
         await actualizarDashboard();
 
@@ -54,6 +61,30 @@ document.getElementById("cropForm").addEventListener("submit", async event => {
     }
 });
 
+function actualizarSelectoresCultivos(cultivos) {
+    const selectors = [
+        document.getElementById("cropSelector"),
+        document.getElementById("cameraCropSelector")
+    ];
+
+    selectors.forEach(selector => {
+        if (!selector) return;
+
+        const valorSeleccionado = selector.value;
+        selector.innerHTML = '<option value="">Selecciona un cultivo</option>';
+
+        cultivos.forEach(cultivo => {
+            const option = document.createElement("option");
+            option.value = String(cultivo.id);
+            option.textContent = cultivo.nombre;
+            if (String(valorSeleccionado) === String(cultivo.id)) {
+                option.selected = true;
+            }
+            selector.appendChild(option);
+        });
+    });
+}
+
 async function actualizarDashboard() {
     const cultivos = await obtenerCultivos();
     const fotografias = await obtenerFotografias();
@@ -64,6 +95,7 @@ async function actualizarDashboard() {
     const list = document.getElementById("cropList");
     const recent = document.getElementById("recentActivity");
 
+    actualizarSelectoresCultivos(cultivos);
     list.innerHTML = "";
     recent.innerHTML = "";
 
@@ -86,10 +118,17 @@ async function actualizarDashboard() {
         const description = document.createElement("p");
         description.textContent = cultivo.descripcion || "Sin descripción";
 
+        const location = document.createElement("p");
+        if (cultivo.latitud != null && cultivo.longitud != null) {
+            location.textContent = `Ubicación: ${cultivo.latitud.toFixed(5)}, ${cultivo.longitud.toFixed(5)}`;
+        } else {
+            location.textContent = "Ubicación: sin coordenadas";
+        }
+
         const date = document.createElement("small");
         date.textContent = `Fecha: ${cultivo.fecha}`;
 
-        item.append(title, area, description, date);
+        item.append(title, area, description, location, date);
         list.appendChild(item);
     });
 

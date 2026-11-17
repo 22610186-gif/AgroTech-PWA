@@ -23,8 +23,16 @@ document.getElementById("startCamera").addEventListener("click", async () => {
 });
 
 document.getElementById("takePhoto").addEventListener("click", async () => {
+    const cropSelector = document.getElementById("cameraCropSelector");
+    const cropId = cropSelector ? Number(cropSelector.value) : null;
+
     if (!cameraStream || video.videoWidth === 0) {
         alert("Primero activa la cámara y espera a que aparezca la imagen.");
+        return;
+    }
+
+    if (!cropId) {
+        alert("Selecciona un cultivo antes de tomar la foto.");
         return;
     }
 
@@ -42,7 +50,7 @@ document.getElementById("takePhoto").addEventListener("click", async () => {
             }, "image/jpeg", 0.85);
         });
 
-        await guardarFotografia(blob);
+        await guardarFotografia(blob, cropId);
         await actualizarDashboard();
         await mostrarGaleria();
 
@@ -56,12 +64,17 @@ document.getElementById("takePhoto").addEventListener("click", async () => {
 
 async function mostrarGaleria() {
     const gallery = document.getElementById("photoGallery");
-    const photos = await obtenerFotografias();
+    const cropSelector = document.getElementById("cameraCropSelector");
+    const selectedCropId = cropSelector ? Number(cropSelector.value) : null;
+    const photos = (await obtenerFotografias()).filter(photo => {
+        if (!selectedCropId) return true;
+        return Number(photo.cultivoId) === selectedCropId;
+    });
 
     gallery.innerHTML = "";
 
     if (photos.length === 0) {
-        gallery.innerHTML = "<p>No hay fotos capturadas.</p>";
+        gallery.innerHTML = "<p>No hay fotos capturadas para este cultivo.</p>";
         return;
     }
 

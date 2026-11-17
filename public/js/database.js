@@ -106,12 +106,13 @@ async function obtenerCultivos() {
     );
 }
 
-async function guardarFotografia(imagen) {
+async function guardarFotografia(imagen, cultivoId = null) {
     return ejecutarTransaccion(
         "fotografias",
         "readwrite",
         store => store.add({
             imagen,
+            cultivoId,
             fecha: new Date().toISOString()
         })
     );
@@ -131,4 +132,31 @@ async function eliminarFotografia(id) {
         "readwrite",
         store => store.delete(id)
     );
+}
+
+async function actualizarCultivo(id, cambios) {
+    const database = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = database.transaction("cultivos", "readwrite");
+        const store = transaction.objectStore("cultivos");
+        const getRequest = store.get(id);
+
+        getRequest.onsuccess = () => {
+            const cultivoActual = getRequest.result;
+
+            if (!cultivoActual) {
+                resolve(null);
+                return;
+            }
+
+            const cultivoActualizado = { ...cultivoActual, ...cambios };
+            const putRequest = store.put(cultivoActualizado);
+
+            putRequest.onsuccess = () => resolve(cultivoActualizado);
+            putRequest.onerror = () => reject(putRequest.error);
+        };
+
+        getRequest.onerror = () => reject(getRequest.error);
+    });
 }

@@ -113,6 +113,9 @@
                         <textarea id="cropDescription"
                             placeholder="Descripción del cultivo"></textarea>
 
+                        <label>Ubicación actual</label>
+                        <p id="cropLocationSummary">Sin ubicación registrada.</p>
+
                         <button class="primary-btn" type="submit">
                             Guardar cultivo
                         </button>
@@ -134,6 +137,11 @@
                 </div>
 
                 <div class="panel">
+                    <label for="cropSelector">Cultivo asociado</label>
+                    <select id="cropSelector" style="width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 8px; border: 1px solid #dfe7e1;">
+                        <option value="">Selecciona un cultivo</option>
+                    </select>
+
                     <button id="getLocation" class="primary-btn">
                         Obtener mi ubicación
                     </button>
@@ -151,6 +159,11 @@
                 </div>
 
                 <div class="panel">
+                    <label for="cameraCropSelector">Asociar foto a cultivo</label>
+                    <select id="cameraCropSelector" style="width: 100%; margin-bottom: 12px; padding: 10px; border-radius: 8px; border: 1px solid #dfe7e1;">
+                        <option value="">Selecciona un cultivo</option>
+                    </select>
+
                     <video id="cameraPreview" autoplay playsinline></video>
 
                     <div class="actions">
